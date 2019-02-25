@@ -46,3 +46,20 @@ cap.release()
 ##########################
 ##### TRAINING MODEL #####
 ##########################
+
+data_path = './faces/users/'
+
+files = [f for f in os.listdir(data_path) if isfile(join(data_path,f))]
+
+trainingData,Labels = [],[]
+
+
+for i,files in enumerate(files):
+    image_path = data_path + files[i]
+    images = cv2.imread(image_path,0)
+    trainingData.append(np.asarray(images,dtype=uint8))
+    Labels.append(i)
+
+Labels =np.asarray(Labels,dtype=np.int32)
+
+model = cv2.face.createLBPHFaceRecognizer()
