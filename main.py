@@ -1,25 +1,48 @@
 
 from train import *
+import os 
+
+path = os.path.dirname(__file__)
+if len(path) != 0:
+    os.chdir(os.path.dirname(path))
+
+try:
+    os.mkdir('faces')
+    os.mkdir('faces/users')
+except:
+    print 'err'
+    pass
 
 cap = cv2.VideoCapture(0)
-trainX = raw_input('Do You want to train(y/n):')
-if str(trainX).lower()=='y':
-   
-    trainN = raw_input('Press "Y" to train on new data, anything else to add new Face: ')
-    if str(trainN).lower() == 'y':
-        while True:
+count=0
+while True:
 
-            _,frame = cap.read()
-            detectedFaces = extractFace(frame)
+    _,frame = cap.read()
+    detectedFaces = extractFace(frame)
 
-            k =cv2.waitKey(1)
+    if detectedFaces is None:
+        cv2.putText(frame,'Face Not Detected',(10,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,1,(0,0,255),1)
+        cv2.imshow('Face Selector',frame)
+    else:
+        count+=1
+        face = cv2.resize(detectedFaces,(200,200))
+        face = cv2.cvtColor(face,cv2.COLOR_BGR2GRAY)
 
-            if detectedFaces is  None:
-                continue
+        file_name_path = './faces/users/'+str(count)+'.jpg'
+        cv2.imwrite(file_name_path,face)
 
-            cv2.imshow('Detected',detectedFaces)
-            if k==27:
-                break
+        cv2.putText(detectedFaces,str(count),(10,20),cv2.FONT_HERSHEY_COMPLEX_SMALL,1,(0,0,255),1)
+        cv2.imshow('Face Selector',detectedFaces)
 
-        cv2.destroyAllWindows()
-        cap.release()
+    k =cv2.waitKey(1) 
+
+
+    if k==27 or count == 100 :
+        break
+
+cv2.destroyAllWindows()
+cap.release()
+
+##########################
+##### TRAINING MODEL #####
+##########################
